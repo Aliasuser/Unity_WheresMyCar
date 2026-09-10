@@ -11,9 +11,9 @@ public class GameObjectsScript : MonoBehaviour
     [HideInInspector]
     public Vector2 garbageTruckCoord;
     [HideInInspector]
-    public Vector2 medicineCord;
+    public Vector2 medicineCoord;
     [HideInInspector]
-    public Vector2 schoolBussCord;
+    public Vector2 schoolBussCoord;
 
     public Canvas canvas;
     public AudioSource carSoundSource;
@@ -21,7 +21,7 @@ public class GameObjectsScript : MonoBehaviour
 
     [HideInInspector]
     public bool inRightPlace = false;
-    public static GameObjectsScript lastDragged = null;
+    public static GameObject lastDragged = null;
     public static bool isDragging = false;
 
 
@@ -29,8 +29,8 @@ public class GameObjectsScript : MonoBehaviour
     void Awake()
     {
         garbageTruckCoord = garbageTruck.GetComponent<RectTransform>().localPosition;
-        medicineCord = medicine.GetComponent<RectTransform>().localPosition;
-        schoolBussCord = schoolBuss.GetComponent<RectTransform>().localPosition;
+        medicineCoord = medicine.GetComponent<RectTransform>().localPosition;
+        schoolBussCoord = schoolBuss.GetComponent<RectTransform>().localPosition;
     }
 
 }
