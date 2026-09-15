@@ -57,6 +57,33 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler
                         case "School":
                             gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[3]);
                             break;
+                        case "b2":
+                            gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[5]);
+                            break;
+                        case "Cement":
+                            gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[6]);
+                            break;
+                        case "e46":
+                            gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[7]);
+                            break;
+                        case "e61":
+                            gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[8]);
+                            break;
+                        case "Excavator":
+                            gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[9]);
+                            break;
+                        case "Police":
+                            gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[10]);
+                            break;
+                        case "Tractor1":
+                            gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[11]);
+                            break;
+                        case "Tractor5":
+                            gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[12]);
+                            break;
+                        case "FireTruck":
+                            gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[13]);
+                            break;
                         default:
                             Debug.Log("No matching tag found.");
                             break;
@@ -83,7 +110,43 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler
                         gameObjectsScript.schoolBuss.GetComponent<RectTransform>().localPosition =
                             gameObjectsScript.schoolBussCoord;
                         break;
-                   
+                    case "b2":
+                        gameObjectsScript.b2.GetComponent<RectTransform>().localPosition =
+                            gameObjectsScript.b2Coord;
+                        break;
+                    case "Cement":
+                        gameObjectsScript.CementTruck.GetComponent<RectTransform>().localPosition =
+                            gameObjectsScript.CementTruckCoord;
+                        break;
+                    case "e46":
+                        gameObjectsScript.e46.GetComponent<RectTransform>().localPosition =
+                            gameObjectsScript.e46Coord;
+                        break;
+                    case "e61":
+                        gameObjectsScript.e61.GetComponent<RectTransform>().localPosition =
+                            gameObjectsScript.e61Coord;
+                        break;
+                    case "Excavator":
+                        gameObjectsScript.Excavator.GetComponent<RectTransform>().localPosition =
+                            gameObjectsScript.ExcavatorCoord;
+                        break;
+                    case "Police":
+                        gameObjectsScript.Police.GetComponent<RectTransform>().localPosition =
+                            gameObjectsScript.PoliceCoord;
+                        break;
+                    case "Tractor1":
+                        gameObjectsScript.Tractor1.GetComponent<RectTransform>().localPosition =
+                            gameObjectsScript.Tractor1Coord;
+                        break;
+                    case "Tractor5":
+                        gameObjectsScript.Tractor5.GetComponent<RectTransform>().localPosition =
+                            gameObjectsScript.Tractor5Coord;
+                        break;
+                    case "FireTruck":
+                        gameObjectsScript.FireTruck.GetComponent<RectTransform>().localPosition =
+                            gameObjectsScript.FireTruckCoord;
+                        break;
+
                     default:
                         Debug.Log("No matching tag found.");
                         break;
