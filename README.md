@@ -1,14 +1,23 @@
 # Car_Game
 **Unity 2D projekts.**
+
 **Spēles mērķis ir atrast un novietot katru automašīnas attēlu tam paredzētajā vietā, izmērā un rotācijā.**
 **Spēles laikā tiek uzņemts laiks, lai sasniegtu labāku rezultātu attēlu ievietošana ir jāveic pēč iespējas ātrāk.**
+
 Spēles kontroles:
+
 Z - Pagriest uz leju
+
 X - Pagriest uz augšu
+
 Space - Apgriezt spoguļskatu
+
 Kreisā bultiņa - Samazināt horizontāli
+
 Labā bultiņa - Palielināt horizontāli
+
 Augšu Bultiņa - Palielināt vertikāli
+
 Uz leju bultiņa - Samazināt vertikāli
 
 ## **Darāmo darbu saraksts:**
