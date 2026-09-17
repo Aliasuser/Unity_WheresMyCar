@@ -31,6 +31,8 @@ Uz leju bultiņa - Samazināt vertikāli
 - [x] Fonu mūzika
 - [ ] Pogu skaņas, objektu skaņas
 #
+
+
 > **Spēles pirmais līmenis**
 <img width="1592" height="893" alt="image" src="https://github.com/user-attachments/assets/6bc5acf6-c5a3-433a-9761-044dec62604d" />
 
