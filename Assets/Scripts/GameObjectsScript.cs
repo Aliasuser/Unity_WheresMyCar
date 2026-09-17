@@ -73,7 +73,6 @@ public class GameObjectsScript : MonoBehaviour
         {
             cars[i].GetComponent<RectTransform>().localPosition = spawnPoints[i].localPosition;
         }
-        positions();
     }
    
     void Awake() //17*2 gab ar placeholder
@@ -97,7 +96,7 @@ public class GameObjectsScript : MonoBehaviour
         }
         RandomizeSpawn();*/
 
-        RandomizeSpawn();
+ 
 
     }
 
