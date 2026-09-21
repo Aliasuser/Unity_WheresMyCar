@@ -4195,6 +4195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c649c0c99bd19d4dae14674b322ad65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clickSound: {fileID: 8300000, guid: 6f569c859c7b8654eb195ebc1e7a637f, type: 3}
 --- !u!114 &1755780384
 MonoBehaviour:
   m_ObjectHideFlags: 0
