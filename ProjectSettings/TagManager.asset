@@ -16,6 +16,7 @@ TagManager:
   - FireTruck
   - b2
   - Cement
+  - Bomb
   layers:
   - Default
   - TransparentFX

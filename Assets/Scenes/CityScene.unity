@@ -4012,6 +4012,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 88a01eaa5e80c7a4ea6d283cf1c60b26, type: 3}
   - {fileID: 8300000, guid: b28f7bcfa69c7f440a7ad14893e89ee9, type: 3}
   - {fileID: 8300000, guid: e3f1633b87fdd584685ce0e78213e3c5, type: 3}
+  - {fileID: 8300000, guid: 7a5432667b4e1714b999083bc69bacf5, type: 3}
+  - {fileID: 8300000, guid: 3b89dcc0baf16d2479dfcd03e4fa33f7, type: 3}
   cars:
   - {fileID: 51252675}
   - {fileID: 989654367}
@@ -4210,8 +4212,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cloudPrefabs:
   - {fileID: 6298427797794002150, guid: f0154bb91db386041a9604fa11158915, type: 3}
+  - {fileID: 630759790692073006, guid: 088f0b5adfaaaff46847a196928c22fc, type: 3}
+  - {fileID: 9206115514333170478, guid: c0040a6172cd2ef4a8ea605866112f05, type: 3}
   plainPrefabs:
   - {fileID: 923102052203999425, guid: 6d13c44b1a3b4fb43a3c55a47e0a1061, type: 3}
+  - {fileID: 4545241813706418208, guid: 459b5fae45e38b441a0b04373299b3d1, type: 3}
+  - {fileID: 9206115514333170478, guid: c0040a6172cd2ef4a8ea605866112f05, type: 3}
   spawnPoint: {fileID: 2139015050}
   cloudSpawnInterval: 3
   plainSpawnInterval: 3
