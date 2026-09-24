@@ -8,6 +8,8 @@ public class WinnerScript : MonoBehaviour
     //Sagatavo mainīgos
     public GameObject winnerBackground;
     public GameObject winnerLogo;
+    [Tooltip("Attēls/logo, kas tiek parādīts, kad spēlētājs ZAUDĒ (nevis uzvaras logo). Ja atstāj tukšu, tiks izmantots winnerLogo.")]
+    public GameObject gameOverLogo;
     public Text timeVictoryText;
     public Text timeGameText;
     public GameObject star1;
@@ -20,15 +22,35 @@ public class WinnerScript : MonoBehaviour
     public GameObject Retry;
     public AudioSource audioSource;
 
+    [Header("Dzīvības")]
+    [Tooltip("Cik reizes spēlētājs drīkst pazaudēt mašīnu sadursmē ar lidojošu objektu, pirms tiek parādīts zaudējuma ekrāns.")]
+    public int maxLives = 3;
+    private int livesLeft;
+
+    [Header("Zaudējuma ekrāna teksts un krāsas")]
+    public string victoryMessage = "Tu uzvarēji!";
+    public string gameOverMessage = "Spēle beigusies!";
+    public Color victoryColor = Color.white;
+    public Color gameOverColor = new Color(0.8f, 0.15f, 0.15f); // sarkanīga
+
+    [Tooltip("Uzvaras loga fona attēls (Image komponents uz winnerBackground), kuram tiks mainīta krāsa zaudējuma gadījumā.")]
+    public Image winnerBackgroundImage;
+
+    [Tooltip("Skaņa, kas atskan, kad spēlētājs zaudē (nav obligāta).")]
+    public AudioClip gameOverSound;
+
     private float startTime;
     private bool timerRunning = false;
     private float endTime;
+    private bool gameEnded = false;
 
     public void Start()
     {
         //Paslēpj uzvaras logu sākumā
         winnerBackground.SetActive(false);
         winnerLogo.SetActive(false);
+        if (gameOverLogo != null)
+            gameOverLogo.SetActive(false);
         timeVictoryText.gameObject.SetActive(false);
         star1.SetActive(false);
         star2.SetActive(false);
@@ -36,6 +58,8 @@ public class WinnerScript : MonoBehaviour
         Texts.gameObject.SetActive(false);
         Back.gameObject.SetActive(false);
         Retry.gameObject.SetActive(false);
+
+        livesLeft = maxLives; //Uzstāda sākuma dzīvību skaitu
 
         startTime = Time.time; //Uzstāda sākuma laiku
         timerRunning = true; // Uzsāk taimeri
@@ -52,13 +76,16 @@ public class WinnerScript : MonoBehaviour
             if (VehicleChecker()) //Pārbauda vai mašīnas ir saliktas pareizās vietās, apstādinat taimeri un parāda uzvaras logu
             {
                 timerRunning = false;
-                ShowWinScreen();
+                ShowEndScreen(true);
             }
         }
     }
 
     public bool VehicleChecker() //Salīdzina mašīnas un mašīnas pozīcijas ar pareizām vietām
     {
+        if (carObjects.Count == 0 || targetPos.Count == 0)
+            return false; //Drošības pārbaude: ja saraksti nav aizpildīti, spēle nekad neuzskata šo par uzvaru
+
         for (int i = 0; i < carObjects.Count; i++)
         {
             if (carObjects[i] == null || targetPos[i] == null)
@@ -70,32 +97,89 @@ public class WinnerScript : MonoBehaviour
         return true;
     }
 
-    void ShowWinScreen() //Parāda uzvaras logu
+    /// <summary>
+    /// Izsauc FlyingObjectControllerScript, kad mašīna tiek iznīcināta sadursmē ar lidojošu objektu.
+    /// Atņem vienu dzīvību; kad dzīvības beidzas, parāda zaudējuma ekrānu.
+    /// </summary>
+    public void LoseLife()
     {
+        if (gameEnded || !timerRunning)
+            return; //Spēle jau beigusies, dzīvības vairs neskaita
+
+        livesLeft--;
+        Debug.Log("Mašīna zaudēta! Atlikušās dzīvības: " + livesLeft);
+
+        if (livesLeft <= 0)
+        {
+            timerRunning = false;
+            ShowEndScreen(false);
+        }
+    }
+
+    void ShowEndScreen(bool isVictory) //Parāda uzvaras vai zaudējuma logu
+    {
+        gameEnded = true;
+
         winnerBackground.SetActive(true);
-        winnerLogo.SetActive(true);
+
+        //Parāda pareizo logo atkarībā no iznākuma
+        if (isVictory)
+        {
+            winnerLogo.SetActive(true);
+            if (gameOverLogo != null)
+                gameOverLogo.SetActive(false);
+        }
+        else
+        {
+            winnerLogo.SetActive(false);
+            //Ja atsevišķs zaudējuma logo nav piesaistīts, rāda uzvaras logo kā rezerves variantu
+            if (gameOverLogo != null)
+                gameOverLogo.SetActive(true);
+            else
+                winnerLogo.SetActive(true);
+        }
+
         timeVictoryText.gameObject.SetActive(true);
         Texts.gameObject.SetActive(true);
         Back.gameObject.SetActive(true);
         Retry.gameObject.SetActive(true);
 
-        
-
-        if (endTime <= 60f) //Pārbauda kāds ir laiks un cik zvaigznes lietotājs iegūst
+        //Iestata tekstu un krāsu atkarībā no iznākuma
+        Texts.text = isVictory ? victoryMessage : gameOverMessage;
+        if (winnerBackgroundImage != null)
         {
-            star3.SetActive(true);
+            winnerBackgroundImage.color = isVictory ? victoryColor : gameOverColor;
         }
-        else if (endTime <= 90)
+
+        if (isVictory)
         {
-            star2.SetActive(true);
+            //Pārbauda kāds ir laiks un cik zvaigznes lietotājs iegūst (0 līdz 3)
+            if (endTime <= 60f)
+            {
+                star1.SetActive(true);
+                star2.SetActive(true);
+                star3.SetActive(true);
+            }
+            else if (endTime <= 90f)
+            {
+                star1.SetActive(true);
+                star2.SetActive(true);
+            }
+            else if (endTime <= 120f)
+            {
+                star1.SetActive(true);
+            }
+            //citādi (endTime > 120f) neviena zvaigzne netiek parādīta (0 zvaigznes)
+
+            if (audioSource != null)
+                audioSource.Play(); //Atskaņo uzvaras audio
         }
         else
         {
-            star1.SetActive(true);
+            //Zaudējuma gadījumā zvaigznes paliek paslēptas (0 zvaigznes)
+            if (gameOverSound != null && audioSource != null)
+                audioSource.PlayOneShot(gameOverSound);
         }
-
-        audioSource.Play(); //Atskaņo uzvaras audio
-
     }
 
     string FormatTime(float secondsTime) //Formatē taimera laiku redzāmākā veidā

@@ -13,6 +13,7 @@ public class FlyingObjectControllerScript : MonoBehaviour
     public float waveFrequency = 1f;
     private GameObjectsScript gameObjectsScript;
     private ScreenBoundaryScript screenBoundaryScript;
+    private WinnerScript winnerScript;
     private CanvasGroup canvasGroup;
     private RectTransform rectTransform;
     private bool isFadingOut = false;
@@ -34,6 +35,7 @@ public class FlyingObjectControllerScript : MonoBehaviour
 
         gameObjectsScript = Object.FindFirstObjectByType<GameObjectsScript>();
         screenBoundaryScript = Object.FindFirstObjectByType<ScreenBoundaryScript>();
+        winnerScript = Object.FindFirstObjectByType<WinnerScript>();
         StartCoroutine(FadeIn());
     }
 
@@ -79,6 +81,11 @@ public class FlyingObjectControllerScript : MonoBehaviour
             if(GameObjectsScript.lastDragged != null)
             {
                 StartCoroutine(ShrinkAndDestroy(GameObjectsScript.lastDragged, 0.5f));
+
+                //Mašīna gāja bojā sadursmē ar lidojošu objektu - atņem vienu dzīvību
+                if (winnerScript != null)
+                    winnerScript.LoseLife();
+
                 GameObjectsScript.lastDragged = null;
                 GameObjectsScript.isDragging = false;
             }
