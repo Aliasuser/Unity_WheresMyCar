@@ -27,6 +27,9 @@ public class WinnerScript : MonoBehaviour
     public int maxLives = 3;
     private int livesLeft;
 
+    [Tooltip("Teksta lauks HUD-ā, kas rāda atlikušās dzīvības (piem. spēles ekrāna augšā, blakus taimerim).")]
+    public Text livesText;
+
     [Header("Zaudējuma ekrāna teksts un krāsas")]
     public string victoryMessage = "Tu uzvarēji!";
     public string gameOverMessage = "Spēle beigusies!";
@@ -38,6 +41,8 @@ public class WinnerScript : MonoBehaviour
 
     [Tooltip("Skaņa, kas atskan, kad spēlētājs zaudē (nav obligāta).")]
     public AudioClip gameOverSound;
+    [Tooltip("Skaņa, kas atskan, kad spēlētājs uzvar (nav obligāta).")]
+    public AudioClip WinningSound;
 
     private float startTime;
     private bool timerRunning = false;
@@ -46,6 +51,8 @@ public class WinnerScript : MonoBehaviour
 
     public void Start()
     {
+        Time.timeScale = 1f; //Drošības pēc atjauno normālu laika gaitu, ja iepriekšējā scēnā tā bija sasaldēta
+
         //Paslēpj uzvaras logu sākumā
         winnerBackground.SetActive(false);
         winnerLogo.SetActive(false);
@@ -60,6 +67,7 @@ public class WinnerScript : MonoBehaviour
         Retry.gameObject.SetActive(false);
 
         livesLeft = maxLives; //Uzstāda sākuma dzīvību skaitu
+        UpdateLivesText();
 
         startTime = Time.time; //Uzstāda sākuma laiku
         timerRunning = true; // Uzsāk taimeri
@@ -108,6 +116,7 @@ public class WinnerScript : MonoBehaviour
 
         livesLeft--;
         Debug.Log("Mašīna zaudēta! Atlikušās dzīvības: " + livesLeft);
+        UpdateLivesText();
 
         if (livesLeft <= 0)
         {
@@ -119,6 +128,8 @@ public class WinnerScript : MonoBehaviour
     void ShowEndScreen(bool isVictory) //Parāda uzvaras vai zaudējuma logu
     {
         gameEnded = true;
+
+        Time.timeScale = 0f; //Sasaldē fonu (lidojošos objektus, animācijas u.c.), kamēr rādās uzvaras/zaudējuma ekrāns
 
         winnerBackground.SetActive(true);
 
@@ -153,26 +164,25 @@ public class WinnerScript : MonoBehaviour
 
         if (isVictory)
         {
-            //Pārbauda kāds ir laiks un cik zvaigznes lietotājs iegūst (0 līdz 3)
-            if (endTime <= 60f)
+            //Pārbauda kāds ir laiks un cik zvaigznes lietotājs iegūst
+            if (endTime <= 120f) //līdz 2 minūtēm ieskaitot - 3 zvaigznes
             {
                 star1.SetActive(true);
                 star2.SetActive(true);
                 star3.SetActive(true);
             }
-            else if (endTime <= 90f)
+            else if (endTime <= 300f) //līdz 5 minūtēm ieskaitot - 2 zvaigznes
             {
                 star1.SetActive(true);
                 star2.SetActive(true);
             }
-            else if (endTime <= 120f)
+            else //vairāk par 5 minūtēm - 1 zvaigzne
             {
                 star1.SetActive(true);
             }
-            //citādi (endTime > 120f) neviena zvaigzne netiek parādīta (0 zvaigznes)
 
             if (audioSource != null)
-                audioSource.Play(); //Atskaņo uzvaras audio
+                audioSource.PlayOneShot(WinningSound); //Atskaņo uzvaras audio
         }
         else
         {
@@ -182,12 +192,18 @@ public class WinnerScript : MonoBehaviour
         }
     }
 
+    void UpdateLivesText() //Atjauno dzīvību skaita tekstu HUD-ā
+    {
+        if (livesText != null)
+            livesText.text = "Dzīvības: " + livesLeft;
+    }
+
     string FormatTime(float secondsTime) //Formatē taimera laiku redzāmākā veidā
     {
         int totalTime = Mathf.FloorToInt(secondsTime);
         int hours = totalTime / 3600;
-        int min = (totalTime % 3600)/60;
+        int min = (totalTime % 3600) / 60;
         int sec = totalTime % 60;
-        return string.Format("{0:00}:{1:00}:{2:00}",hours, min, sec);
+        return string.Format("{0:00}:{1:00}:{2:00}", hours, min, sec);
     }
 }

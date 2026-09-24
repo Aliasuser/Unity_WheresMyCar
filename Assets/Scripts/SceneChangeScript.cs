@@ -10,6 +10,7 @@ public class SceneChangeScript : MonoBehaviour
 
     public void ToLevel1() // Aizved lietotāju uz pirmo līmeni
     {
+        Time.timeScale = 1f; //Atjauno normālu laika gaitu, ja spēle bija sasalusi (uzvaras/zaudējuma ekrāns)
         StartCoroutine(PlaySoundThenDo(() => SceneManager.LoadScene("CityScene", LoadSceneMode.Single)));
     }
     /*
@@ -20,11 +21,13 @@ public class SceneChangeScript : MonoBehaviour
     */
     public void ToMainMenu() // Aizved lietotāju uz sākuma ekrānu
     {
+        Time.timeScale = 1f; //Atjauno normālu laika gaitu, ja spēle bija sasalusi (uzvaras/zaudējuma ekrāns)
         StartCoroutine(PlaySoundThenDo(() => SceneManager.LoadScene("MainMenu", LoadSceneMode.Single)));
     }
 
     public void Quit() //Aizver spēli
     {
+        Time.timeScale = 1f;
         StartCoroutine(PlaySoundThenDo(() => Application.Quit()));
     }
 
@@ -39,7 +42,9 @@ public class SceneChangeScript : MonoBehaviour
 
         if (wait > 0f)
         {
-            yield return new WaitForSeconds(wait);
+            //WaitForSecondsRealtime turpina skaitīt neatkarīgi no Time.timeScale,
+            //tāpēc poga strādā arī tad, ja spēle bija sasalusi uzvaras/zaudējuma ekrānā
+            yield return new WaitForSecondsRealtime(wait);
         }
 
         action();
