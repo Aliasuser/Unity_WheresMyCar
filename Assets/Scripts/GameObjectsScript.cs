@@ -57,6 +57,8 @@ public class GameObjectsScript : MonoBehaviour
     public bool inRightPlace = false;
     public static GameObject lastDragged = null;
     public static bool isDragging = false;
+    // Set to true once the game has ended (win or lose) so other scripts can stop responding to input.
+    public static bool isGameEnded = false;
 
     void RandomizeSpawn()
     {

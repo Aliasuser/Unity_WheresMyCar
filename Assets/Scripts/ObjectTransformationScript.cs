@@ -11,6 +11,8 @@ public class ObjectTransformationScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (GameObjectsScript.isGameEnded) return; // Spēle jau beigusies - vairs nevar rotēt/mainīt izmēru
+
         if(GameObjectsScript.lastDragged != null)
         {
             if (Input.GetKey(KeyCode.Z))
@@ -46,24 +48,28 @@ public class ObjectTransformationScript : MonoBehaviour
 
             if (Input.GetKey(KeyCode.LeftArrow))
             {
-                if (GameObjectsScript.lastDragged.GetComponent<RectTransform>().localScale.y > 0.3f)
-                {
-                    GameObjectsScript.lastDragged.GetComponent<RectTransform>().localScale =
-                        new Vector3(GameObjectsScript.lastDragged.GetComponent<RectTransform>().localScale.x - 0.001f,
-                        GameObjectsScript.lastDragged.GetComponent<RectTransform>().localScale.y, 1f);
-                }
+                RectTransform rt = GameObjectsScript.lastDragged.GetComponent<RectTransform>();
+                float sign = Mathf.Sign(rt.localScale.x == 0 ? 1f : rt.localScale.x); // saglabā spoguļošanas virzienu (+1 vai -1)
+                float magnitude = Mathf.Abs(rt.localScale.x);
 
+                if (magnitude > 0.3f)
+                {
+                    magnitude -= 0.001f;
+                    rt.localScale = new Vector3(sign * magnitude, rt.localScale.y, 1f);
+                }
             }
 
             if (Input.GetKey(KeyCode.RightArrow))
             {
-                if (GameObjectsScript.lastDragged.GetComponent<RectTransform>().localScale.y < 0.9f)
-                {
-                    GameObjectsScript.lastDragged.GetComponent<RectTransform>().localScale =
-                        new Vector3(GameObjectsScript.lastDragged.GetComponent<RectTransform>().localScale.x + 0.001f,
-                        GameObjectsScript.lastDragged.GetComponent<RectTransform>().localScale.y, 1f);
-                }
+                RectTransform rt = GameObjectsScript.lastDragged.GetComponent<RectTransform>();
+                float sign = Mathf.Sign(rt.localScale.x == 0 ? 1f : rt.localScale.x); // saglabā spoguļošanas virzienu (+1 vai -1)
+                float magnitude = Mathf.Abs(rt.localScale.x);
 
+                if (magnitude < 0.9f)
+                {
+                    magnitude += 0.001f;
+                    rt.localScale = new Vector3(sign * magnitude, rt.localScale.y, 1f);
+                }
             }
 
             if (Input.GetKeyDown(KeyCode.Space))

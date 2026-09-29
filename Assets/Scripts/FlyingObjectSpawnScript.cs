@@ -10,6 +10,8 @@ public class FlyingObjectSpawnScript : MonoBehaviour
     public GameObject[] plainPrefabs;
     [Header("Spawn Point")]
     public Transform spawnPoint;
+    [Tooltip("Canvas transform, lai lidojošie objekti tiktu novietoti Canvas hierarhijas priekšplānā (virs mašīnām), nevis paslēpti aiz spawnPoint sākotnējās vietas hierarhijā.")]
+    public RectTransform canvasRoot;
 
     [Header("Spawn Interval")]
     public float cloudSpawnInterval = 2f;
@@ -37,13 +39,16 @@ public class FlyingObjectSpawnScript : MonoBehaviour
 
     void SpawnCloud()
     {
+        if (GameObjectsScript.isGameEnded) return; // Spēle beigusies - vairs nespawno jaunus objektus, kas varētu pārklāt uzvaras ekrānu
         if (cloudPrefabs.Length == 0) return;
 
         GameObject prefab = cloudPrefabs[Random.Range(0, cloudPrefabs.Length)];
         float y = Random.Range(minY, maxY);
 
         Vector3 pos = new Vector3(spawnPoint.position.x, y, spawnPoint.position.z);
-        GameObject cloud = Instantiate(prefab, pos, Quaternion.identity, spawnPoint);
+        Transform parent = canvasRoot != null ? (Transform)canvasRoot : spawnPoint;
+        GameObject cloud = Instantiate(prefab, pos, Quaternion.identity, parent);
+        cloud.transform.SetAsLastSibling(); // Renderē mākoni virs mašīnām (Canvas: pēdējais bērns = priekšplānā)
         float speed = Random.Range(cloudMinSpeed, cloudMaxSpeed);
 
         FlyingObjectControllerScript controller = cloud.GetComponent<FlyingObjectControllerScript>();
@@ -56,13 +61,16 @@ public class FlyingObjectSpawnScript : MonoBehaviour
 
     void SpawnPlain()
     {
+        if (GameObjectsScript.isGameEnded) return; // Spēle beigusies - vairs nespawno jaunus objektus, kas varētu pārklāt uzvaras ekrānu
         if (plainPrefabs.Length == 0) return;
 
         GameObject prefab = plainPrefabs[Random.Range(0, plainPrefabs.Length)];
         float y = Random.Range(minY, maxY);
 
         Vector3 pos = new Vector3(-spawnPoint.position.x, y, spawnPoint.position.z);
-        GameObject plain = Instantiate(prefab, pos, Quaternion.identity, spawnPoint);
+        Transform parent = canvasRoot != null ? (Transform)canvasRoot : spawnPoint;
+        GameObject plain = Instantiate(prefab, pos, Quaternion.identity, parent);
+        plain.transform.SetAsLastSibling(); // Renderē lidmašīnu virs mašīnām
         float speed = Random.Range(plainMinSpeed, plainMaxSpeed);
 
         FlyingObjectControllerScript controller = plain.GetComponent<FlyingObjectControllerScript>();

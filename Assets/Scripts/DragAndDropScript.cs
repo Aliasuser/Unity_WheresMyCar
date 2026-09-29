@@ -23,6 +23,8 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (GameObjectsScript.isGameEnded) return; // Spēle jau beigusies
+
         if(Input.GetMouseButton(0) && !Input.GetMouseButton(1) && !Input.GetMouseButton(2))
         {
             Debug.Log("Left mouse button clicked on " + gameObject.name);
@@ -32,14 +34,16 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (GameObjectsScript.isGameEnded) return; // Spēle jau beigusies - vairs nevar vilkt mašīnas
+
         if (Input.GetMouseButton(0) && !Input.GetMouseButton(1) && !Input.GetMouseButton(2))
         {
             GameObjectsScript.isDragging = true;
             canvasGroup.alpha = 0.6f;
             canvasGroup.blocksRaycasts = false;
-            int lastIndex = transform.parent.childCount - 1;
-            int positionIndex = Mathf.Max(0, lastIndex - 1);
-            transform.SetSiblingIndex(positionIndex);
+            // Uzliek vilkto mašīnu pilnīgi priekšplānā, kamēr to velk - nevis uz fiksētu indeksu,
+            // kas var novecoties, ja pēc tam tiek spawnoti jauni mākoņi/lidmašīnas.
+            transform.SetAsLastSibling();
 
             Vector3 cursorWorldPos = Camera.main.ScreenToWorldPoint(new Vector3(
                 Input.mousePosition.x, Input.mousePosition.y, screenBoundaryScript.screenPoint.z));
@@ -53,6 +57,8 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (GameObjectsScript.isGameEnded) return; // Spēle jau beigusies - pārtrauc vilkšanu, ja tā jau notiek
+
         if(Input.GetMouseButton(0) && !Input.GetMouseButton(1) && !Input.GetMouseButton(2))
         {
             Vector3 cursScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenBoundaryScript.screenPoint.z);

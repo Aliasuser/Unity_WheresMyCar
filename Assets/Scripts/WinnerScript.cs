@@ -69,6 +69,8 @@ public class WinnerScript : MonoBehaviour
         livesLeft = maxLives; //Uzstāda sākuma dzīvību skaitu
         UpdateLivesText();
 
+        GameObjectsScript.isGameEnded = false; //Drošības pēc atbloķē ievadi, ja scēna tiek pārstartēta
+
         startTime = Time.time; //Uzstāda sākuma laiku
         timerRunning = true; // Uzsāk taimeri
     }
@@ -94,9 +96,28 @@ public class WinnerScript : MonoBehaviour
         if (carObjects.Count == 0 || targetPos.Count == 0)
             return false; //Drošības pārbaude: ja saraksti nav aizpildīti, spēle nekad neuzskata šo par uzvaru
 
+        // Ja kāda mašīna sadursmē ir iznīcināta (kļuvusi par null), izņem to un tās mērķa vietu
+        // no pārbaudes saraksta, lai spēli joprojām varētu uzvarēt bez tās, un paslēpj pašu
+        // stāvvietu, lai tā vairs nerādās uz ekrāna kā neizmantojama.
+        for (int i = carObjects.Count - 1; i >= 0; i--)
+        {
+            if (carObjects[i] == null)
+            {
+                if (i < targetPos.Count && targetPos[i] != null)
+                    targetPos[i].SetActive(false);
+
+                carObjects.RemoveAt(i);
+                if (i < targetPos.Count)
+                    targetPos.RemoveAt(i);
+            }
+        }
+
+        if (carObjects.Count == 0 || targetPos.Count == 0)
+            return false; //Visas mašīnas iznīcinātas - nav ko pārbaudīt (uzvaru nosaka dzīvību sistēma)
+
         for (int i = 0; i < carObjects.Count; i++)
         {
-            if (carObjects[i] == null || targetPos[i] == null)
+            if (targetPos[i] == null)
                 return false;
 
             if (Vector3.Distance(carObjects[i].transform.position, targetPos[i].transform.position) > 1f)
@@ -128,10 +149,12 @@ public class WinnerScript : MonoBehaviour
     void ShowEndScreen(bool isVictory) //Parāda uzvaras vai zaudējuma logu
     {
         gameEnded = true;
+        GameObjectsScript.isGameEnded = true; //Bloķē mašīnu vilkšanu un pagriešanu pēc spēles beigām
 
         Time.timeScale = 0f; //Sasaldē fonu (lidojošos objektus, animācijas u.c.), kamēr rādās uzvaras/zaudējuma ekrāns
 
         winnerBackground.SetActive(true);
+        winnerBackground.transform.SetAsLastSibling(); // Nodrošina, ka uzvaras/zaudējuma ekrāns ir VIENMĒR priekšplānā
 
         //Parāda pareizo logo atkarībā no iznākuma
         if (isVictory)

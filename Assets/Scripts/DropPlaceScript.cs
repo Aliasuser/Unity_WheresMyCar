@@ -15,6 +15,8 @@ public class DropPlaceScript : MonoBehaviour, IDropHandler
     }
     public void OnDrop(PointerEventData eventData)
     {
+        if (GameObjectsScript.isGameEnded) return; // Spēle jau beigusies
+
         if((eventData.pointerDrag != null) && Input.GetMouseButtonUp(0) &&
             (!Input.GetMouseButton(2)))
         {
