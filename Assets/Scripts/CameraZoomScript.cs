@@ -20,7 +20,6 @@ public class CameraZoomScript : MonoBehaviour
     [Header("References")]
     public ScreenBoundaryScript screenBoundaryScript;
     public Camera mainCamera;
-    float startZoom;
     Vector2 lastTouchPos;
     int panFingerId = -1;
     bool isTouchPan = false;
@@ -42,9 +41,9 @@ public class CameraZoomScript : MonoBehaviour
 
     private void Start()
     {
-        startZoom = mainCamera.orthographicSize;
+        
         screenBoundaryScript.RecalculateBounds();
-        transform.position = screenBoundaryScript.GetClampedPosition(transform.position);
+        transform.position = screenBoundaryScript.GetClampedCameraPosition(transform.position);
     }
 
     void Update()
@@ -67,10 +66,7 @@ public class CameraZoomScript : MonoBehaviour
         UpdateMaxZoom();
         mainCamera.orthographicSize = Mathf.Clamp(mainCamera.orthographicSize, minZoom, maxZoom);
         screenBoundaryScript.RecalculateBounds();
-        transform.position = screenBoundaryScript.GetClampedPosition(transform.position);
-
-
-
+        transform.position = screenBoundaryScript.GetClampedCameraPosition(transform.position);
 
     }
 
@@ -90,13 +86,12 @@ public class CameraZoomScript : MonoBehaviour
         transform.position = Vector3.Lerp(transform.position, targetPosition, mouseFollowSpeed * Time.unscaledDeltaTime);
     }
 
-    void HandlePinch()
+    void HandleTouch()
     {
         if (Input.touchCount != 1)
             return;
 
         Touch touch = Input.GetTouch(0);
-
         if (IsTouchUIButton(touch.position))
             return;
 
@@ -106,6 +101,7 @@ public class CameraZoomScript : MonoBehaviour
             if(dt <= doubleTapMaxDelay && Vector2.Distance(touch.position, lastTouchPos) <= doubleTapMaxDistance)
             {
                 StartCoroutine(ResetZoomSmooth());
+                lastTapTime = 0f;
             }
             else
             {
@@ -127,6 +123,16 @@ public class CameraZoomScript : MonoBehaviour
             isTouchPan = false;
             panFingerId = -1;
         }
+    }
+
+    void HandlePinch()
+    {
+        Touch touch0 = Input.GetTouch(0), touch1 = Input.GetTouch(1);
+        float prevDistance = ((touch0.position - touch0.deltaPosition) -
+            (touch1.position - touch1.deltaPosition)).magnitude;
+
+        float currentDistance = (touch0.position - touch1.position).magnitude;
+        mainCamera.orthographicSize -= (currentDistance - prevDistance) * pinchZoomSpeed;
     }
 
     bool IsTouchUIButton(Vector2 touchposition)
@@ -165,12 +171,12 @@ public class CameraZoomScript : MonoBehaviour
             elapsed += Time.unscaledDeltaTime;
             mainCamera.orthographicSize = Mathf.Lerp(currentZoom, targetZoom, elapsed / duration);
             screenBoundaryScript.RecalculateBounds();
-            transform.position = screenBoundaryScript.GetClampedPosition(transform.position);
+            transform.position = screenBoundaryScript.GetClampedCameraPosition(transform.position);
             yield return null;
         }
         mainCamera.orthographicSize = targetZoom;
         screenBoundaryScript.RecalculateBounds();
-        transform.position = screenBoundaryScript.GetClampedPosition(transform.position);
+        transform.position = screenBoundaryScript.GetClampedCameraPosition(transform.position);
     }
 
     void UpdateMaxZoom()
