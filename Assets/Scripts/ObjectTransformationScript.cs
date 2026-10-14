@@ -1,10 +1,12 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class ObjectTransformationScript : MonoBehaviour
 {
     public float rotationSpeed = 90f;
     public float scaledSpeed = 0.5f;
+    public float minScale = 0.3f;
+    public float maxScale = 0.9f;
     public bool rotateCW, rotateCCW, scaleUpY, scaleDownY, scaleUpX, scaleDownX;
     public static bool isTransforming = false;
     //public GameObjectsScript gameObjectsScript;
@@ -25,30 +27,33 @@ public class ObjectTransformationScript : MonoBehaviour
             rc.Rotate(0, 0, rotationSpeed * Time.deltaTime);
         }
 
-        if (scaleUpY && rc.localScale.y < 0.9f)
-        {
-            rc.localScale += new Vector3(0, scaledSpeed * Time.deltaTime, 0);
-            
-        }
+        // Mērogu maina caur izmēra vērtību (Abs), lai spoguļošana (negatīvs X) neapgrieztu mērogošanu
+        Vector3 s = rc.localScale;
+        float signX = s.x < 0f ? -1f : 1f;
+        float magX = Mathf.Abs(s.x);
+        float magY = s.y;
 
-        if (scaleDownY && rc.localScale.y > 0.3f)
-        {
-            rc.localScale -= new Vector3(0, scaledSpeed * Time.deltaTime, 0);
+        if (scaleUpY) magY += scaledSpeed * Time.deltaTime;
+        if (scaleDownY) magY -= scaledSpeed * Time.deltaTime;
+        if (scaleUpX) magX += scaledSpeed * Time.deltaTime;
+        if (scaleDownX) magX -= scaledSpeed * Time.deltaTime;
 
-        }
+        magX = Mathf.Clamp(magX, minScale, maxScale);
+        magY = Mathf.Clamp(magY, minScale, maxScale);
 
-        if (scaleUpX && rc.localScale.x < 0.9f)
-        {
-            rc.localScale += new Vector3(scaledSpeed * Time.deltaTime, 0 , 0);
+        rc.localScale = new Vector3(signX * magX, magY, s.z);
 
-        }
+        isTransforming = rotateCW || rotateCCW || scaleUpY || scaleDownY || scaleUpX || scaleDownX;
+    }
 
-        if (scaleUpX && rc.localScale.x < 0.9f)
-        {
-            rc.localScale += new Vector3(scaledSpeed * Time.deltaTime, 0 , 0);
+    public void MirrorCar()
+    {
+        if (GameObjectsScript.lastDragged == null)
+            return;
 
-        }
-        isTransforming = rotateCW || rotateCCW || scaleDownX || scaleUpX || scaleDownX;
+        RectTransform rc = GameObjectsScript.lastDragged.GetComponent<RectTransform>();
+        Vector3 s = rc.localScale;
+        rc.localScale = new Vector3(-s.x, s.y, s.z); // mainās tikai X zīme, izmērs un rotācija paliek
     }
 
     public void StartRotateCW(BaseEventData eventData)
@@ -94,8 +99,6 @@ public class ObjectTransformationScript : MonoBehaviour
     }
 
     public void StopScaleUpX(BaseEventData eventData)
-
-
     {
         scaleUpX = false;
     }
@@ -104,8 +107,8 @@ public class ObjectTransformationScript : MonoBehaviour
     {
         scaleDownX = true;
     }
-    
-     public void StopScaleDownX(BaseEventData eventData)
+
+    public void StopScaleDownX(BaseEventData eventData)
     {
         scaleDownX = false;
     }

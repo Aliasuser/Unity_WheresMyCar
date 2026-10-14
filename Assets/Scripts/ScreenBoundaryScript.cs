@@ -39,7 +39,7 @@ public class ScreenBoundaryScript : MonoBehaviour
             if (!Mathf.Approximately(mainCamera.orthographicSize, lastOrthographicSize))
                 changed = true;
         }
-        if(!Mathf.Approximately(mainCamera.aspect, lastAspect))
+        if (!Mathf.Approximately(mainCamera.aspect, lastAspect))
             changed = true;
         if (mainCamera.transform.position != lastCamPos)
             changed = true;
@@ -62,7 +62,7 @@ public class ScreenBoundaryScript : MonoBehaviour
             float halfHeight = mainCamera.orthographicSize;
             float halfWidth = halfHeight * mainCamera.aspect;
 
-            if(halfWidth *2f >= (wbMaxX - wbMinX))
+            if (halfWidth * 2f >= (wbMaxX - wbMinX))
             {
                 minCamX = maxCamX = (wbMinX + wbMaxX) * 0.5f;
             }
@@ -94,9 +94,9 @@ public class ScreenBoundaryScript : MonoBehaviour
         float shrinkW = worldBounds.width * reductionFactor;
         float shrinkH = worldBounds.height * reductionFactor;
         float wbMinX = worldBounds.xMin + shrinkW;
-        float wbMaxX = worldBounds.xMin - shrinkW;
+        float wbMaxX = worldBounds.xMax - shrinkW;
         float wbMinY = worldBounds.yMin + shrinkH;
-        float wbMaxY = worldBounds.yMin - shrinkH;
+        float wbMaxY = worldBounds.yMax - shrinkH;
 
         float clampedX = Mathf.Clamp(curPosition.x, wbMinX, wbMaxX);
         float clampedY = Mathf.Clamp(curPosition.y, wbMinY, wbMaxY);
