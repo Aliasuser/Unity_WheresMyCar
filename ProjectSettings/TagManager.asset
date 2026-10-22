@@ -17,6 +17,8 @@ TagManager:
   - b2
   - Cement
   - Bomb
+  - InterstitialAdButton
+  - RewardedAdButton
   layers:
   - Default
   - TransparentFX

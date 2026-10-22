@@ -4,7 +4,6 @@ using UnityEngine.Advertisements;
 
 public class AdsInitializer : MonoBehaviour, IUnityAdsInitializationListener
 {
-
     [SerializeField] string _androidGameId;
     [SerializeField] bool _testMode = true;
     private string _gameId;
@@ -20,7 +19,8 @@ public class AdsInitializer : MonoBehaviour, IUnityAdsInitializationListener
 #if UNITY_ANDROID || UNITY_EDITOR
         _gameId = _androidGameId;
 #endif
-        if(!Advertisement.isInitialized && Advertisement.isSupported)
+
+        if (!Advertisement.isInitialized && Advertisement.isSupported)
         {
             Advertisement.Initialize(_gameId, _testMode, this);
         }

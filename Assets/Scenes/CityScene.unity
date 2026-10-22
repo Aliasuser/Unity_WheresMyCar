@@ -7027,7 +7027,7 @@ GameObject:
   - component: {fileID: 1828170524}
   m_Layer: 0
   m_Name: InterstitialAd
-  m_TagString: Untagged
+  m_TagString: InterstitialAdButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7147,7 +7147,7 @@ GameObject:
   - component: {fileID: 1832805145}
   m_Layer: 0
   m_Name: RewardedAd
-  m_TagString: Untagged
+  m_TagString: RewardedAdButton
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -7265,6 +7265,8 @@ GameObject:
   - component: {fileID: 1864340959}
   - component: {fileID: 1864340961}
   - component: {fileID: 1864340960}
+  - component: {fileID: 1864340963}
+  - component: {fileID: 1864340962}
   m_Layer: 0
   m_Name: AdsScriptHolder
   m_TagString: Untagged
@@ -7315,7 +7317,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   adsInitializer: {fileID: 1864340959}
   interstitialAd: {fileID: 1864340961}
-  turnOffInterstitialAds: 0
+  turnOffInterstitialAds: 1
+  rewardedAds: {fileID: 1864340963}
+  turnOffRewardedAds: 0
 --- !u!114 &1864340961
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7328,9 +7332,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d83818dfb276ed94da6e2533a359c42b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _androidAdUnitId: Interstitial_Android
+  _androidAdUnitId: BP_Interstitial_Android
   isReady: 0
   _interstitialAdButton: {fileID: 1828170524}
+--- !u!114 &1864340962
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1864340957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34524adb8c49e2f4ba94ded27aeef4cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1864340963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1864340957}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 18309905ab79d52409f0f145210c6255, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _androidAdUnitId: BP_Rewarded_Android
+  _rewardedAdButton: {fileID: 1832805145}
+  flyingObjectManager: {fileID: 1864340962}
 --- !u!1 &1885341285
 GameObject:
   m_ObjectHideFlags: 0
