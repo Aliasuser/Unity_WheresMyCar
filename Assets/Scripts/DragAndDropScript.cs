@@ -16,14 +16,14 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
     void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
-        if(canvasGroup == null)
+        if (canvasGroup == null)
         {
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
-        if(gameObjectsScript == null)
+        if (gameObjectsScript == null)
             gameObjectsScript = Object.FindFirstObjectByType<GameObjectsScript>();
 
-        if(screenBoundaryScript == null)
+        if (screenBoundaryScript == null)
             screenBoundaryScript = Object.FindFirstObjectByType<ScreenBoundaryScript>();
 
         canvas = GetComponentInParent<Canvas>();
@@ -40,9 +40,9 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
         Debug.Log("Clicked on " + gameObject.name);
 
 
-        //if (GameObjectsScript.isGameEnded) return; // Spēle jau beigusies
+        if (GameObjectsScript.isGameEnded) return; // Spēle jau beigusies
 
-        if(gameObjectsScript.carSoundSource != null && gameObjectsScript.sounds != null)
+        if (gameObjectsScript.carSoundSource != null && gameObjectsScript.sounds != null)
         {
             gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[0]);
         }
@@ -53,7 +53,7 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
 
         Debug.Log("Start drag!");
 
-        //if (GameObjectsScript.isGameEnded) return; // Spēle jau beigusies - vairs nevar vilkt mašīnas
+        if (GameObjectsScript.isGameEnded) return; // Spēle jau beigusies - vairs nevar vilkt mašīnas
 
         GameObjectsScript.isDragging = true;
         canvasGroup.alpha = 0.6f;
@@ -63,7 +63,7 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
         transform.SetSiblingIndex(positionIndex);
 
         Vector3 cursorWorldPos;
-        if(ScreenToWorldPoint(eventData.position, out cursorWorldPos))
+        if (ScreenToWorldPoint(eventData.position, out cursorWorldPos))
         {
             dragOffsetWorld = transform.position - cursorWorldPos;
         }
@@ -89,7 +89,7 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
     private bool ScreenToWorldPoint(Vector2 screenPosition, out Vector3 worldPosition)
     {
         worldPosition = Vector3.zero;
-        if(mainCamera == null)
+        if (mainCamera == null)
         {
             Debug.LogWarning("Main camera is not assigned.");
             return false;
@@ -105,11 +105,12 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
     {
 
 
-       // if (GameObjectsScript.isGameEnded) return; // Spēle jau beigusies - pārtrauc vilkšanu, ja tā jau notiek
+        if (GameObjectsScript.isGameEnded) return; // Spēle jau beigusies - pārtrauc vilkšanu, ja tā jau notiek
 
         Vector3 pointerWorld;
-        if(!ScreenToWorldPoint(eventData.position, out pointerWorld)) { 
-            return; 
+        if (!ScreenToWorldPoint(eventData.position, out pointerWorld))
+        {
+            return;
         }
 
 
@@ -121,17 +122,24 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
 
         transform.position = new Vector3(clamped.x, clamped.y, desired.z);
 
-       /* if(Input.GetMouseButton(0) && !Input.GetMouseButton(1) && !Input.GetMouseButton(2))
-        {
-            Vector3 cursScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenBoundaryScript.screenPoint.z);
-            Vector3 curPosition = Camera.main.ScreenToWorldPoint(cursScreenPoint) + screenBoundaryScript.offset;
-            rectTransform.position = screenBoundaryScript.GetClampedPosition(curPosition);
-        }*/
+        /* if(Input.GetMouseButton(0) && !Input.GetMouseButton(1) && !Input.GetMouseButton(2))
+         {
+             Vector3 cursScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenBoundaryScript.screenPoint.z);
+             Vector3 curPosition = Camera.main.ScreenToWorldPoint(cursScreenPoint) + screenBoundaryScript.offset;
+             rectTransform.position = screenBoundaryScript.GetClampedPosition(curPosition);
+         }*/
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if(gameObjectsScript.carSoundSource != null && gameObjectsScript.sounds != null)
+        if (GameObjectsScript.isGameEnded)
+        {
+            //Spēle beigusies - tikai atjauno izskatu, bez skaņas un bez novietošanas loģikas
+            GameObjectsScript.isDragging = false;
+            canvasGroup.alpha = 1f;
+            return;
+        }
+        if (gameObjectsScript.carSoundSource != null && gameObjectsScript.sounds != null)
         {
             gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[0]);
             GameObjectsScript.isDragging = false;
@@ -145,7 +153,7 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
             }
             gameObjectsScript.inRightPlace = false;
         }
-        
+
     }
-    
+
 }

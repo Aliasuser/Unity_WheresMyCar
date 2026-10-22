@@ -24,7 +24,7 @@ public class FlyingObjectControllerScript : MonoBehaviour
     void Start()
     {
         canvasGroup = GetComponent<CanvasGroup>();
-        if(canvasGroup == null)
+        if (canvasGroup == null)
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
         rectTransform = GetComponent<RectTransform>();
         image = GetComponent<Image>();
@@ -41,7 +41,7 @@ public class FlyingObjectControllerScript : MonoBehaviour
 
     {
         float time = 0f;
-        while(time < fadeDuration)
+        while (time < fadeDuration)
         {
             time += Time.deltaTime;
             canvasGroup.alpha = Mathf.Lerp(0f, 1f, time / fadeDuration);
@@ -54,9 +54,10 @@ public class FlyingObjectControllerScript : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
+        if (GameObjectsScript.isGameEnded) return; //Spēle beigusies - lidojošie objekti apstājas un vairs nereaģē uz pieskārieniem
         float waveOffset = Mathf.Sin(Time.time * waveFrequency) * waveAmplitude;
         rectTransform.anchoredPosition += new Vector2(-speed * Time.deltaTime, waveOffset * Time.deltaTime);
-        if(speed > 0 && transform.position.x < screenBoundaryScript.worldBounds.xMin + 80)
+        if (speed > 0 && transform.position.x < screenBoundaryScript.worldBounds.xMin + 80)
         {
             StartCoroutine(FadeOutAndDestroy());
             isFadingOut = true;
@@ -76,7 +77,7 @@ public class FlyingObjectControllerScript : MonoBehaviour
         if (inputPosition.x < 0 || inputPosition.x > Screen.width || inputPosition.y < 0 || inputPosition.y > Screen.height || Camera.main == null)
             return;
 
-        if(CompareTag("Bomb") && !isExploding && 
+        if (CompareTag("Bomb") && !isExploding &&
             RectTransformUtility.RectangleContainsScreenPoint(
                 rectTransform, inputPosition, Camera.main))
         {
@@ -84,10 +85,11 @@ public class FlyingObjectControllerScript : MonoBehaviour
             TriggerExplosion();
         }
 
-        if(GameObjectsScript.isDragging && !isFadingOut && RectTransformUtility.RectangleContainsScreenPoint(
-            rectTransform, inputPosition, Camera.main)){
+        if (GameObjectsScript.isDragging && !isFadingOut && RectTransformUtility.RectangleContainsScreenPoint(
+            rectTransform, inputPosition, Camera.main))
+        {
             Debug.Log("Cursor collided with a flying object!");
-            if(GameObjectsScript.lastDragged != null)
+            if (GameObjectsScript.lastDragged != null)
             {
                 StartCoroutine(ShrinkAndDestroy(GameObjectsScript.lastDragged, 0.5f));
 
@@ -104,16 +106,16 @@ public class FlyingObjectControllerScript : MonoBehaviour
             else
                 StartAndDestroy(Color.cyan);
         }
-        
+
 
     }
 
     bool TryGetInputPosition(out Vector2 inputPosition)
     {
-        #if UNITY_EDITOR || UNITY_STANDALONE
-                inputPosition = Input.mousePosition;
-                return true;
-        #elif UNITY_ANDROID
+#if UNITY_EDITOR || UNITY_STANDALONE
+        inputPosition = Input.mousePosition;
+        return true;
+#elif UNITY_ANDROID
                 if(Input.touchCount > 0){
                     inputPosition = Input.GetTouch(0).position;
                     return true;
@@ -122,7 +124,7 @@ public class FlyingObjectControllerScript : MonoBehaviour
                     return false;
                 }
 
-        #endif
+#endif
     }
 
 
@@ -139,7 +141,7 @@ public class FlyingObjectControllerScript : MonoBehaviour
             obj.transform.rotation = Quaternion.Euler(0f, 0f, angle);
 
             yield return null;
-            
+
         }
         Destroy(obj);
 
@@ -148,17 +150,17 @@ public class FlyingObjectControllerScript : MonoBehaviour
     public void TriggerExplosion()
     {
         isExploding = true;
-        if(gameObjectsScript.carSoundSource != null && gameObjectsScript.sounds != null)
+        if (gameObjectsScript.carSoundSource != null && gameObjectsScript.sounds != null)
         {
             gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[15], 5f);
         }
 
-        if(TryGetComponent<Animator>(out Animator animator))
+        if (TryGetComponent<Animator>(out Animator animator))
         {
             animator.SetBool("explode", true);
         }
 
-        if(image != null)
+        if (image != null)
         {
             image.color = Color.red;
             StartCoroutine(RecoverColor(0.4f));
@@ -172,7 +174,7 @@ public class FlyingObjectControllerScript : MonoBehaviour
     IEnumerator RecoverColor(float seconds)
     {
         yield return new WaitForSeconds(seconds);
-        if(image != null)
+        if (image != null)
         {
             image.color = originalColor;
         }
@@ -180,9 +182,9 @@ public class FlyingObjectControllerScript : MonoBehaviour
 
     IEnumerator Vibrate()
     {
-        #if UNITY_ANDROID
-           Handheld.Vibrate();
-        #endif
+#if UNITY_ANDROID
+        Handheld.Vibrate();
+#endif
         Vector2 originalPos = rectTransform.anchoredPosition;
         float duration = 0.4f;
         float elapsed = 0f;
@@ -214,12 +216,12 @@ public class FlyingObjectControllerScript : MonoBehaviour
     void ExplodeAndDestroyNearbyObjects(float radius)
     {
         Collider2D[] hit = Physics2D.OverlapCircleAll(transform.position, radius);
-        foreach(Collider2D item in hit)
+        foreach (Collider2D item in hit)
         {
-            if(item != null && item.gameObject != gameObject)
+            if (item != null && item.gameObject != gameObject)
             {
                 FlyingObjectControllerScript flyingObject = item.GetComponent<FlyingObjectControllerScript>();
-                if(flyingObject != null && !flyingObject.isExploding)
+                if (flyingObject != null && !flyingObject.isExploding)
                 {
                     flyingObject.StartAndDestroy(Color.cyan);
                 }
@@ -229,18 +231,19 @@ public class FlyingObjectControllerScript : MonoBehaviour
 
     public void StartAndDestroy(Color color)
     {
-        if (!isFadingOut) {
+        if (!isFadingOut)
+        {
             StartCoroutine(FadeOutAndDestroy());
             isFadingOut = true;
 
-            if(image != null)
+            if (image != null)
             {
                 image.color = color;
                 StartCoroutine(RecoverColor(0.5f));
             }
             StartCoroutine(Vibrate());
 
-            if(gameObjectsScript.carSoundSource != null && gameObjectsScript.sounds != null)
+            if (gameObjectsScript.carSoundSource != null && gameObjectsScript.sounds != null)
             {
                 gameObjectsScript.carSoundSource.PlayOneShot(gameObjectsScript.sounds[14]);
             }
@@ -251,7 +254,7 @@ public class FlyingObjectControllerScript : MonoBehaviour
     {
         float time = 0f;
         float startAlpha = canvasGroup.alpha;
-        while(time < fadeDuration)
+        while (time < fadeDuration)
         {
             time += Time.deltaTime;
             canvasGroup.alpha = Mathf.Lerp(startAlpha, 0f, time / fadeDuration);

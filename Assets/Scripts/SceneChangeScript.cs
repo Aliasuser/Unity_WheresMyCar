@@ -11,7 +11,7 @@ public class SceneChangeScript : MonoBehaviour
     public void ToLevel1() // Aizved lietotāju uz pirmo līmeni
     {
         Time.timeScale = 1f; //Atjauno normālu laika gaitu, ja spēle bija sasalusi (uzvaras/zaudējuma ekrāns)
-        StartCoroutine(PlaySoundThenDo(() => SceneManager.LoadScene("CityScene", LoadSceneMode.Single)));
+        StartCoroutine(PlaySoundThenDo(() => { GameObjectsScript.isGameEnded = false; SceneManager.LoadScene("CityScene", LoadSceneMode.Single); }));
     }
     /*
     public void ToLevel2() // Aizved lietotāju uz otro līmeni
@@ -22,7 +22,7 @@ public class SceneChangeScript : MonoBehaviour
     public void ToMainMenu() // Aizved lietotāju uz sākuma ekrānu
     {
         Time.timeScale = 1f; //Atjauno normālu laika gaitu, ja spēle bija sasalusi (uzvaras/zaudējuma ekrāns)
-        StartCoroutine(PlaySoundThenDo(() => SceneManager.LoadScene("MainMenu", LoadSceneMode.Single)));
+        StartCoroutine(PlaySoundThenDo(() => { GameObjectsScript.isGameEnded = false; SceneManager.LoadScene("MainMenu", LoadSceneMode.Single); }));
     }
 
     public void Quit() //Aizver spēli
@@ -51,5 +51,3 @@ public class SceneChangeScript : MonoBehaviour
     }
 
 }
-
-

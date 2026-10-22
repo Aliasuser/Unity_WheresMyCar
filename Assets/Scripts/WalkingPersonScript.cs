@@ -39,6 +39,7 @@ public class WalkingPersonScript : MonoBehaviour
 
     void Update()
     {
+        if (GameObjectsScript.isGameEnded) return; //Spēle beigusies - cilvēks apstājas
         Move();
         AnimateWalk();
     }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.Advertisements;
 using UnityEngine.UI;
@@ -39,12 +39,13 @@ public class BannerAd : MonoBehaviour
 
     }
 
-    
+
 
     void OnBannerLoad()
     {
         Debug.Log("Banner ad loaded!");
-        _bannerButton.interactable = true;
+        if (_bannerButton != null) //Poga var būt iznīcināta, ja scēna jau nomainīta
+            _bannerButton.interactable = !GameObjectsScript.isGameEnded;
     }
 
     void OnBannerError(string message)
@@ -55,6 +56,7 @@ public class BannerAd : MonoBehaviour
 
     public void ShowBannerAd()
     {
+        if (GameObjectsScript.isGameEnded) return; //Spēle beigusies - reklāmas nav pieejamas
         if (isBannerVisible)
             HideBannerAd();
         else
@@ -67,7 +69,7 @@ public class BannerAd : MonoBehaviour
             };
             Advertisement.Banner.Show(_adUnitId, bannerOptions);
         }
-            
+
     }
 
     void OnBannerClicked()

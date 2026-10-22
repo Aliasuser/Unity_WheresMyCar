@@ -12,7 +12,7 @@ public class ObjectTransformationScript : MonoBehaviour
     //public GameObjectsScript gameObjectsScript;
     void Update()
     {
-        if (GameObjectsScript.lastDragged == null)
+        if (GameObjectsScript.isGameEnded || GameObjectsScript.lastDragged == null)
             return;
 
         RectTransform rc = GameObjectsScript.lastDragged.GetComponent<RectTransform>();
@@ -48,7 +48,7 @@ public class ObjectTransformationScript : MonoBehaviour
 
     public void MirrorCar()
     {
-        if (GameObjectsScript.lastDragged == null)
+        if (GameObjectsScript.isGameEnded || GameObjectsScript.lastDragged == null)
             return;
 
         RectTransform rc = GameObjectsScript.lastDragged.GetComponent<RectTransform>();

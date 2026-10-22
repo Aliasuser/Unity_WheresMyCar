@@ -1,4 +1,4 @@
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -30,7 +30,7 @@ public class CameraZoomScript : MonoBehaviour
 
     void Awake()
     {
-        if(mainCamera == null)
+        if (mainCamera == null)
             mainCamera = GetComponent<Camera>();
 
         if (screenBoundaryScript == null)
@@ -41,13 +41,16 @@ public class CameraZoomScript : MonoBehaviour
 
     private void Start()
     {
-        
+
         screenBoundaryScript.RecalculateBounds();
         transform.position = screenBoundaryScript.GetClampedCameraPosition(transform.position);
     }
 
     void Update()
     {
+        if (GameObjectsScript.isGameEnded) //Spēle beigusies - kameru vairs nevar kustināt vai tuvināt
+            return;
+
         if (ObjectTransformationScript.isTransforming)
             return;
 
@@ -75,7 +78,7 @@ public class CameraZoomScript : MonoBehaviour
     void DesktopFollowCursor()
     {
         Vector3 mousePos = Input.mousePosition;
-        if(mousePos.x < 0 || mousePos.x > Screen.width || mousePos.y < 0 || mousePos.y > Screen.height)
+        if (mousePos.x < 0 || mousePos.x > Screen.width || mousePos.y < 0 || mousePos.y > Screen.height)
         {
             return;
         }
@@ -95,10 +98,10 @@ public class CameraZoomScript : MonoBehaviour
         if (IsTouchUIButton(touch.position))
             return;
 
-        if(touch.phase == TouchPhase.Began)
+        if (touch.phase == TouchPhase.Began)
         {
             float dt = Time.time - lastTapTime;
-            if(dt <= doubleTapMaxDelay && Vector2.Distance(touch.position, lastTouchPos) <= doubleTapMaxDistance)
+            if (dt <= doubleTapMaxDelay && Vector2.Distance(touch.position, lastTouchPos) <= doubleTapMaxDistance)
             {
                 StartCoroutine(ResetZoomSmooth());
                 lastTapTime = 0f;
@@ -113,12 +116,13 @@ public class CameraZoomScript : MonoBehaviour
             isTouchPan = true;
 
         }
-        else if(touch.phase == TouchPhase.Moved && isTouchPan && touch.fingerId == panFingerId)
+        else if (touch.phase == TouchPhase.Moved && isTouchPan && touch.fingerId == panFingerId)
         {
             Vector2 delta = touch.position - lastTouchPos;
             transform.Translate(ScreenDeltaToWorldDelta(delta) * touchPanSpeed, Space.World);
             lastTouchPos = touch.position;
-        }else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+        }
+        else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
         {
             isTouchPan = false;
             panFingerId = -1;
@@ -143,9 +147,9 @@ public class CameraZoomScript : MonoBehaviour
         List<RaycastResult> results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(pointerData, results);
 
-        foreach(RaycastResult result in results)
+        foreach (RaycastResult result in results)
         {
-            if(result.gameObject.GetComponent<UnityEngine.UI.Button>() != null)
+            if (result.gameObject.GetComponent<UnityEngine.UI.Button>() != null)
             {
                 return true;
             }
@@ -168,6 +172,7 @@ public class CameraZoomScript : MonoBehaviour
         float targetZoom = maxZoom;
         while (elapsed < duration)
         {
+            if (GameObjectsScript.isGameEnded) yield break; //Spēle beigusies - pārtrauc kameras atiestatīšanu
             elapsed += Time.unscaledDeltaTime;
             mainCamera.orthographicSize = Mathf.Lerp(currentZoom, targetZoom, elapsed / duration);
             screenBoundaryScript.RecalculateBounds();

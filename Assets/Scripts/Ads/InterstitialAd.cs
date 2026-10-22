@@ -21,15 +21,16 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
 
     private void Update()
     {
-        if (AdManager.Instance != null && AdManager.Instance.interstitialAd != null)
+        if (_interstitialAdButton != null && AdManager.Instance != null && AdManager.Instance.interstitialAd != null)
         {
-            _interstitialAdButton.interactable = AdManager.Instance.interstitialAd.isReady;
+            _interstitialAdButton.interactable = !GameObjectsScript.isGameEnded && AdManager.Instance.interstitialAd.isReady;
         }
     }
 
 
     public void OnInterstitialAdButtonClicked()
     {
+        if (GameObjectsScript.isGameEnded) return; //Spēle beigusies - reklāmas nav pieejamas
         Debug.Log("Interstitial Ad Button Clicked");
         ShowInterstitial();
     }
@@ -84,7 +85,8 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
     public void OnUnityAdsAdLoaded(string placementId)
     {
         Debug.Log("Interstitial ad loaded successfully!");
-        _interstitialAdButton.interactable = true;
+        if (_interstitialAdButton != null)
+            _interstitialAdButton.interactable = !GameObjectsScript.isGameEnded;
         isReady = true;
         OnInterstitialAdReady?.Invoke();
     }
@@ -112,17 +114,17 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
         else
         {
             Debug.LogWarning($"Interstitial ad was not completed: {showCompletionState.ToString()}");
-            Time.timeScale = 1f;
+            Time.timeScale = GameObjectsScript.isGameEnded ? 0f : 1f; //Ja spēle beigusies, laiks paliek apturēts
             LoadAd();
         }
     }
 
     private IEnumerator SlowDownTimeTemporarily(float duration)
     {
-        Time.timeScale = 0.3f;
+        Time.timeScale = GameObjectsScript.isGameEnded ? 0f : 0.3f;
         Debug.Log("Time slowed down for " + duration + " seconds.");
         yield return new WaitForSecondsRealtime(duration);
-        Time.timeScale = 1f;
+        Time.timeScale = GameObjectsScript.isGameEnded ? 0f : 1f; //Ja pa to laiku spēle beigusies, laiks paliek apturēts
         Debug.Log("Time restored to normal.");
     }
 

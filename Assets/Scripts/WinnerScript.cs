@@ -150,6 +150,8 @@ public class WinnerScript : MonoBehaviour
     {
         gameEnded = true;
         GameObjectsScript.isGameEnded = true; //Bloķē mašīnu vilkšanu un pagriešanu pēc spēles beigām
+        if (AdManager.Instance != null)
+            AdManager.Instance.DisableAdButtons(); //Reklāmu pogas vairs nav nospiežamas, kad spēle beigusies
 
         Time.timeScale = 0f; //Sasaldē fonu (lidojošos objektus, animācijas u.c.), kamēr rādās uzvaras/zaudējuma ekrāns
 

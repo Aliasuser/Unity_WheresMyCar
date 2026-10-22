@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Advertisements;
 using UnityEngine.UI;
@@ -12,12 +12,12 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
     [SerializeField] Button _rewardedAdButton;
     public FlyingObjectManager flyingObjectManager;
 
-    
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
     {
         _adUnitId = _androidAdUnitId;
-        if(flyingObjectManager == null)
+        if (flyingObjectManager == null)
             flyingObjectManager = FindFirstObjectByType<FlyingObjectManager>();
     }
 
@@ -38,15 +38,18 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
 
         if (placementId.Equals(_adUnitId))
         {
-            _rewardedAdButton.interactable = true;
+            if (_rewardedAdButton != null) //Poga var būt iznīcināta, ja scēna jau nomainīta
+                _rewardedAdButton.interactable = !GameObjectsScript.isGameEnded;
         }
     }
 
     public void ShowAd()
     {
+        if (GameObjectsScript.isGameEnded) return; //Spēle beigusies - reklāmas nav pieejamas
         //vlekak jaspaslwpek banenra dad
 
-        _rewardedAdButton.interactable = false;
+        if (_rewardedAdButton != null)
+            _rewardedAdButton.interactable = false;
         Advertisement.Show(_adUnitId, this);
     }
 
@@ -84,10 +87,11 @@ public class RewardedAds : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowLi
         {
             Debug.Log("Rewarded ad completed!");
             flyingObjectManager.DestroyAllFlyingObjects();
-            _rewardedAdButton.interactable = false;
+            if (_rewardedAdButton != null)
+                _rewardedAdButton.interactable = false;
             StartCoroutine(WaitAndLoadAd(10f));
         }
-        Time.timeScale = 1f;
+        Time.timeScale = GameObjectsScript.isGameEnded ? 0f : 1f; //Ja spēle beigusies, laiks paliek apturēts
     }
 
     public void SetButton(Button button)
