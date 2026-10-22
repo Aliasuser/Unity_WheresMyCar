@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UnityEngine.Advertisements.Advertisement;
 
 public class AdManager : MonoBehaviour
 {
@@ -12,6 +13,9 @@ public class AdManager : MonoBehaviour
     public RewardedAds rewardedAds;
     [SerializeField] bool turnOffRewardedAds = false;
 
+
+    public BannerAd bannerAd;
+    [SerializeField] bool turnOffBannerAds = false;
     public static AdManager Instance { get; private set; }
 
     private bool firstSceneLoaded = false;
@@ -46,6 +50,11 @@ public class AdManager : MonoBehaviour
         if (!turnOffRewardedAds)
         {
             rewardedAds.LoadAd();
+        }
+
+        if (!turnOffBannerAds)
+        {
+            bannerAd.LoadBanner();
         }
 
         // Vēlāk papildināsim priekš pārējām reklāmām
@@ -98,7 +107,17 @@ public class AdManager : MonoBehaviour
             rewardedAds.SetButton(rewardedAdButton);
         }
 
-        // Vēlāk jāpapildina ar pārējām pogām
+        if (bannerAd == null)
+            bannerAd = FindFirstObjectByType<BannerAd>();
+
+        Button bannerAdButton =
+          GameObject.FindGameObjectWithTag("BannerAdButton").GetComponent<Button>();
+        if (bannerAd != null && bannerAdButton != null)
+        {
+            bannerAd.SetButton(bannerAdButton);
+        }
+
+
 
         if (!firstSceneLoaded)
         {
