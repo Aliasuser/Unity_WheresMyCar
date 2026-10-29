@@ -198,6 +198,12 @@ public class HanoiGameManager : MonoBehaviour
         if (rewardedAd != null) rewardedAd.ResetUses();
     }
 
+    /// <summary>Called after the entry ad: if the player hasn't moved yet, the time spent on the ad doesn't count.</summary>
+    public void ResetClockIfNoMoves()
+    {
+        if (Steps == 0 && !finished) { Elapsed = 0f; UpdateHud(); }
+    }
+
     /// <summary>Takes seconds off the timer (Watch Ad reward). The time never goes below zero.</summary>
     public void ReduceTime(float seconds)
     {

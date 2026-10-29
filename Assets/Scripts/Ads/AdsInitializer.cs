@@ -8,10 +8,22 @@ public class AdsInitializer : MonoBehaviour, IUnityAdsInitializationListener
     [SerializeField] bool _testMode = true;
     private string _gameId;
     public event Action OnAdsInitialized;
+    private bool notified;
 
     void Awake()
     {
         InitializeAds();
+    }
+
+    void Start()
+    {
+        // The menu/Hanoi flow may already have initialised Unity Ads, in which case Initialize() below is
+        // skipped and OnInitializationComplete never fires - tell AdManager anyway so the car level's ads still load.
+        if (Advertisement.isInitialized && !notified)
+        {
+            notified = true;
+            OnAdsInitialized?.Invoke();
+        }
     }
 
     public void InitializeAds()
@@ -29,6 +41,8 @@ public class AdsInitializer : MonoBehaviour, IUnityAdsInitializationListener
     public void OnInitializationComplete()
     {
         Debug.Log("Unity Ads initialization complete.");
+        if (notified) return;
+        notified = true;
         OnAdsInitialized?.Invoke();
     }
 

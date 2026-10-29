@@ -13,12 +13,12 @@ public class SceneChangeScript : MonoBehaviour
         Time.timeScale = 1f; //Atjauno normālu laika gaitu, ja spēle bija sasalusi (uzvaras/zaudējuma ekrāns)
         StartCoroutine(PlaySoundThenDo(() => { GameObjectsScript.isGameEnded = false; SceneManager.LoadScene("CityScene", LoadSceneMode.Single); }));
     }
-    /*
+    
     public void ToLevel2() // Aizved lietotāju uz otro līmeni
     {
-        SceneManager.LoadScene("Level2", LoadSceneMode.Single);
+        SceneManager.LoadScene("HanoiScene", LoadSceneMode.Single);
     }
-    */
+    
     public void ToMainMenu() // Aizved lietotāju uz sākuma ekrānu
     {
         Time.timeScale = 1f; //Atjauno normālu laika gaitu, ja spēle bija sasalusi (uzvaras/zaudējuma ekrāns)
