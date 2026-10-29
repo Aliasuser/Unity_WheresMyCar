@@ -22,7 +22,7 @@ public class HanoiRewardedAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSh
 
     [Header("Reward")]
     [Tooltip("How many seconds are taken off the timer for one watched ad.")]
-    public float secondsRemoved = 20f;
+    public float secondsRemoved = 40f;
     [Tooltip("How many ads can be watched in one attempt (resets on Restart).")]
     public int maxUsesPerRun = 3;
 
