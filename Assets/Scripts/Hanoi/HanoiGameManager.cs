@@ -25,6 +25,8 @@ public class HanoiGameManager : MonoBehaviour
     public int targetRodIndex = 2;
     [Tooltip("How close (world units) the dragged block's centre must be to a rod to snap onto it.")]
     public float snapDistance = 2.0f;
+    [Tooltip("Height (world Y) a click-selected block is lifted to - above the tops of the rods.")]
+    public float liftY = 2.35f;
     public SpriteRenderer background;
 
     [Header("Stars (seconds)")]
@@ -65,6 +67,9 @@ public class HanoiGameManager : MonoBehaviour
     public string mainMenuScene = "MainMenu";
 
     public bool CanInteract => !finished;
+    public bool HasSelection => selected != null;
+    private HanoiBlock selected;   // block lifted by a click, waiting for a rod to be tapped
+
     public int Steps { get; private set; }
     public float Elapsed { get; private set; }
 
@@ -136,6 +141,7 @@ public class HanoiGameManager : MonoBehaviour
     {
         foreach (var b in blocks) if (b) Destroy(b.gameObject);
         blocks.Clear();
+        selected = null;
         foreach (var r in rods) r.Clear();
 
         HanoiRod start = rods[startRodIndex];
@@ -210,6 +216,83 @@ public class HanoiGameManager : MonoBehaviour
     public void NotifyFirstGrab()
     {
         if (!clockStarted) { clockStarted = true; timerRunning = true; }
+    }
+
+    // ----------------------------------------------------- click to lift / click to place
+
+    /// <summary>Tap on a block: select it, deselect it, or (if another block is lifted) place that one on this block's rod.</summary>
+    public void OnBlockClicked(HanoiBlock block)
+    {
+        if (finished) return;
+
+        if (selected == null)
+        {
+            if (block.rod != null && block.rod.Top == block && !block.IsBusy) Select(block);
+        }
+        else if (selected == block)
+        {
+            Deselect();
+        }
+        else if (block.rod != null)
+        {
+            TryPlaceSelected(block.rod);
+        }
+    }
+
+    /// <summary>Tap on a rod: place the lifted block there, or (if nothing is lifted) lift that rod's top block.</summary>
+    public void OnRodClicked(HanoiRod rod)
+    {
+        if (finished) return;
+
+        if (selected != null) TryPlaceSelected(rod);
+        else if (rod.Top != null && !rod.Top.IsBusy) Select(rod.Top);
+    }
+
+    /// <summary>A drag started: a click-selected block (if any) goes back down first.</summary>
+    public void OnDragStarted(HanoiBlock dragged)
+    {
+        if (selected == null) return;
+        if (selected == dragged) selected = null;   // dragging the lifted block itself: just carry on
+        else Deselect();
+    }
+
+    private void Select(HanoiBlock block)
+    {
+        NotifyFirstGrab();
+        selected = block;
+        PlayPickUp();
+        block.LiftTo(liftY);
+    }
+
+    private void Deselect()
+    {
+        if (selected == null) return;
+        var b = selected;
+        selected = null;
+        b.SlideToRod(b.rod, false);
+    }
+
+    private void TryPlaceSelected(HanoiRod target)
+    {
+        var block = selected;
+        if (block == null || block.IsBusy) return;
+        HanoiRod origin = block.rod;
+
+        if (target == origin)
+        {
+            Deselect();                       // tapped its own rod: put it back, no step
+        }
+        else if (target.CanAccept(block))
+        {
+            selected = null;
+            MoveBlock(block, origin, target);
+            block.SlideToRod(target, true);
+        }
+        else
+        {
+            PlayInvalid();                    // illegal: stay lifted so another rod can be chosen
+            block.Flash();
+        }
     }
 
     /// <summary>Called by a block when a legal move has been dropped. Updates stacks and the step counter.</summary>

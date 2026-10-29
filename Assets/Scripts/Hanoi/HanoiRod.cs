@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 /// <summary>
 /// One rod of the Tower of Hanoi. Keeps the ordered stack of blocks that sit on it
@@ -7,12 +8,33 @@ using UnityEngine;
 /// The rod graphic itself is baked into the background image, so this is just an
 /// invisible marker placed on top of the drawn rod.
 /// </summary>
-public class HanoiRod : MonoBehaviour
+public class HanoiRod : MonoBehaviour, IPointerClickHandler
 {
     [Tooltip("World Y of the floor the bottom block rests on (the top of the bamboo ground).")]
     public float floorY = -2.55f;
 
+    [Tooltip("Width (world units) of the invisible column you can tap to place a lifted block on this rod.")]
+    public float tapWidth = 2.2f;
+    [Tooltip("Height of that tap column, measured up from the floor.")]
+    public float tapHeight = 5.6f;
+
     private readonly List<HanoiBlock> stack = new List<HanoiBlock>();
+
+    private void Awake()
+    {
+        // Invisible tap area so a rod can be clicked (click-to-place).
+        if (GetComponent<Collider2D>() == null)
+        {
+            var box = gameObject.AddComponent<BoxCollider2D>();
+            box.size = new Vector2(tapWidth, tapHeight);
+            box.offset = new Vector2(0f, floorY + tapHeight * 0.5f - transform.position.y);
+        }
+    }
+
+    public void OnPointerClick(PointerEventData e)
+    {
+        if (HanoiGameManager.Instance != null) HanoiGameManager.Instance.OnRodClicked(this);
+    }
 
     public int Count => stack.Count;
     public HanoiBlock Top => stack.Count > 0 ? stack[stack.Count - 1] : null;

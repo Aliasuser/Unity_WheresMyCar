@@ -10,7 +10,7 @@ using UnityEngine.EventSystems;
 /// size: 0 = smallest block (0block.png) ... 5 = biggest block (5block.png).
 /// </summary>
 [RequireComponent(typeof(SpriteRenderer))]
-public class HanoiBlock : MonoBehaviour, IPointerDownHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class HanoiBlock : MonoBehaviour, IPointerDownHandler, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public int size;
     [HideInInspector] public HanoiRod rod;
@@ -46,7 +46,16 @@ public class HanoiBlock : MonoBehaviour, IPointerDownHandler, IBeginDragHandler,
 
     public void OnPointerDown(PointerEventData e)
     {
-        if (CanGrab()) HanoiGameManager.Instance.PlayPickUp();
+        var mgr = HanoiGameManager.Instance;
+        if (CanGrab() && !mgr.HasSelection) mgr.PlayPickUp();
+    }
+
+    /// <summary>A tap/click (press and release without dragging): select, deselect or place - decided by the manager.</summary>
+    public void OnPointerClick(PointerEventData e)
+    {
+        if (e.dragging || busy) return;
+        var mgr = HanoiGameManager.Instance;
+        if (mgr != null) mgr.OnBlockClicked(this);
     }
 
     public void OnBeginDrag(PointerEventData e)
@@ -54,6 +63,7 @@ public class HanoiBlock : MonoBehaviour, IPointerDownHandler, IBeginDragHandler,
         dragging = false;
         if (!CanGrab()) return;
 
+        HanoiGameManager.Instance.OnDragStarted(this);   // drops a click-selected block back first
         dragging = true;
         originRod = rod;
         if (cam == null) cam = Camera.main;
@@ -93,7 +103,7 @@ public class HanoiBlock : MonoBehaviour, IPointerDownHandler, IBeginDragHandler,
         {
             // Illegal: a bigger block can't go on a smaller one.
             mgr.PlayInvalid();
-            StartCoroutine(FlashRed());
+            Flash();
             SlideToRod(originRod, false);
         }
     }
@@ -128,33 +138,59 @@ public class HanoiBlock : MonoBehaviour, IPointerDownHandler, IBeginDragHandler,
     /// <summary>Slides the block to the resting place on top of <paramref name="r"/>.</summary>
     public void SlideToRod(HanoiRod r, bool playDropSound)
     {
-        Vector3 slot = r.GetNextSlotPosition(this);
-        if (slideRoutine != null) StopCoroutine(slideRoutine);
-        slideRoutine = StartCoroutine(SlideRoutine(slot, 0.22f, playDropSound));
+        StartSlide(r.GetNextSlotPosition(this), playDropSound, false);
     }
 
-    private IEnumerator SlideRoutine(Vector3 end, float duration, bool playDropSound)
+    /// <summary>Lifts the block straight up above its rod (click-to-select).</summary>
+    public void LiftTo(float y)
+    {
+        StartSlide(new Vector3(transform.position.x, y, 0f), false, true);
+    }
+
+    public bool IsBusy => busy;
+
+    private void StartSlide(Vector3 end, bool playDropSound, bool keepOnTop)
+    {
+        if (slideRoutine != null) StopCoroutine(slideRoutine);
+        slideRoutine = StartCoroutine(SlideRoutine(end, playDropSound, keepOnTop));
+    }
+
+    /// <summary>Path: rise (if needed) -> sideways -> down, so a block never cuts through other stacks.</summary>
+    private IEnumerator SlideRoutine(Vector3 end, bool playDropSound, bool keepOnTop)
     {
         busy = true;
+        sr.sortingOrder = baseSortingOrder + 100;
+
         Vector3 start = transform.position;
-        // Never start lower than the resting place, so the path never cuts through other blocks.
-        start.y = Mathf.Max(start.y, end.y);
-        transform.position = start;
+        float travelY = Mathf.Max(start.y, end.y);
+        float up = travelY - start.y;
+        float side = Mathf.Abs(end.x - start.x);
+        float down = travelY - end.y;
+        float total = up + side + down;
+        float duration = Mathf.Clamp(total / 16f, 0.12f, 0.45f);
 
         for (float t = 0f; t < duration; t += Time.deltaTime)
         {
-            float k = Mathf.SmoothStep(0f, 1f, t / duration);
-            transform.position = Vector3.Lerp(start, end, k);
+            float s = Mathf.SmoothStep(0f, 1f, t / duration) * total;
+            Vector3 p;
+            if (s < up) p = new Vector3(start.x, start.y + s, 0f);
+            else if (s < up + side)
+                p = new Vector3(Mathf.MoveTowards(start.x, end.x, s - up), travelY, 0f);
+            else p = new Vector3(end.x, travelY - (s - up - side), 0f);
+            transform.position = p;
             yield return null;
         }
         transform.position = end;
-        sr.sortingOrder = baseSortingOrder;
+        sr.sortingOrder = keepOnTop ? baseSortingOrder + 100 : baseSortingOrder;
         busy = false;
         slideRoutine = null;
 
         if (playDropSound) HanoiGameManager.Instance.PlayDrop();
         HanoiGameManager.Instance.OnBlockSettled();
     }
+
+    /// <summary>Quick red flash = "that move isn't allowed".</summary>
+    public void Flash() { StartCoroutine(FlashRed()); }
 
     private IEnumerator FlashRed()
     {

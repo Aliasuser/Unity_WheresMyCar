@@ -428,7 +428,7 @@ MonoBehaviour:
   androidGameId: 800388721
   testMode: 1
   androidAdUnitId: BP_Rewarded_Android
-  secondsRemoved: 20
+  secondsRemoved: 40
   maxUsesPerRun: 3
   watchAdButton: {fileID: 37738768}
   watchAdLabel: {fileID: 0}
@@ -442,12 +442,12 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
-  m_PlayOnAwake: 0
-  m_Volume: 1
+  m_audioClip: {fileID: 8300000, guid: da169c60fdffb9c4c98f2271addd60ce, type: 3}
+  m_Resource: {fileID: 8300000, guid: da169c60fdffb9c4c98f2271addd60ce, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.2
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -572,6 +572,7 @@ MonoBehaviour:
   startRodIndex: 0
   targetRodIndex: 2
   snapDistance: 2
+  liftY: 2.35
   background: {fileID: 1652804118}
   threeStarTime: 150
   twoStarTime: 240
@@ -580,7 +581,7 @@ MonoBehaviour:
   menuButton: {fileID: 397299580}
   restartButton: {fileID: 1435989894}
   rewardedAd: {fileID: 129204231}
-  startTimerOnFirstGrab: 0
+  startTimerOnFirstGrab: 1
   winPanel: {fileID: 422180856}
   winStars:
   - {fileID: 1588382662}
@@ -596,7 +597,7 @@ MonoBehaviour:
   audioSource: {fileID: 129204232}
   pickUpSound: {fileID: 8300000, guid: 6195ffdcffc180d43a2c478b703500a3, type: 3}
   dropSound: {fileID: 8300000, guid: bc200857a8dedac44814c98678fe98d2, type: 3}
-  invalidSound: {fileID: 0}
+  invalidSound: {fileID: 8300000, guid: 3cf046efa8cfaac4196b0975675f2d6d, type: 3}
   winSound: {fileID: 8300000, guid: 517aa35e25d7fa54593db25d79e3ed38, type: 3}
   mainMenuScene: MainMenu
 --- !u!4 &129204235
@@ -1194,6 +1195,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floorY: -2.55
+  tapWidth: 2.2
+  tapHeight: 5.6
 --- !u!4 &659538596
 Transform:
   m_ObjectHideFlags: 0
@@ -1476,6 +1479,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floorY: -2.55
+  tapWidth: 2.2
+  tapHeight: 5.6
 --- !u!4 &1013433855
 Transform:
   m_ObjectHideFlags: 0
@@ -2238,6 +2243,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   floorY: -2.55
+  tapWidth: 2.2
+  tapHeight: 5.6
 --- !u!4 &1675423186
 Transform:
   m_ObjectHideFlags: 0
