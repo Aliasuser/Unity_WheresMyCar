@@ -78,6 +78,8 @@ public static class HanoiSceneBuilder
         mgr.blockSprites = Enumerable.Range(0, 6).Select(i => LoadSprite("Assets/Sprites/" + i + "block.png")).ToArray();
         mgr.blockCount = 6;
 
+        rootGo.AddComponent<HanoiBannerAd>();   // banner ad at the bottom of the screen
+
         var audio = rootGo.AddComponent<AudioSource>();
         audio.playOnAwake = false;
         mgr.audioSource = audio;

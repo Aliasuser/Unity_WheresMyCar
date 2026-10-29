@@ -13,7 +13,7 @@ using UnityEngine.UI;
 /// It also initialises Unity Ads itself, because the Hanoi scene can be opened straight from
 /// the main menu (where no ad objects exist).
 /// </summary>
-public class HanoiRewardedAd : MonoBehaviour, IUnityAdsInitializationListener, IUnityAdsLoadListener, IUnityAdsShowListener
+public class HanoiRewardedAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
 {
     [Header("Ads (same ids as CityScene)")]
     [SerializeField] string androidGameId = "800388721";
@@ -50,9 +50,7 @@ public class HanoiRewardedAd : MonoBehaviour, IUnityAdsInitializationListener, I
 
     private void Start()
     {
-        if (Advertisement.isInitialized) LoadAd();
-        else if (Advertisement.isSupported) Advertisement.Initialize(androidGameId, testMode, this);
-        else Debug.Log("Hanoi: Unity Ads not supported on this platform, Watch Ad stays disabled.");
+        HanoiAdsInit.Ensure(androidGameId, testMode, () => { if (this != null) LoadAd(); });
     }
 
     private void Update()
@@ -98,15 +96,6 @@ public class HanoiRewardedAd : MonoBehaviour, IUnityAdsInitializationListener, I
     {
         yield return new WaitForSecondsRealtime(seconds);   // realtime: timeScale may be 0 during an ad
         LoadAd();
-    }
-
-    // ---------------------------------------------------------------- IUnityAdsInitializationListener
-
-    public void OnInitializationComplete() { LoadAd(); }
-
-    public void OnInitializationFailed(UnityAdsInitializationError error, string message)
-    {
-        Debug.LogWarning("Hanoi: Unity Ads init failed: " + error + " - " + message);
     }
 
     // ---------------------------------------------------------------- IUnityAdsLoadListener

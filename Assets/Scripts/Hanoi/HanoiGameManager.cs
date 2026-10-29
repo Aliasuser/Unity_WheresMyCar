@@ -145,7 +145,8 @@ public class HanoiGameManager : MonoBehaviour
         Screen.orientation = prevOrientation;
     }
 
-    /// <summary>Shows the whole background; extra height (wide-short screens) is added above, as sky.</summary>
+    /// <summary>Shows the whole background; extra height (wide-short screens) is added above, as sky.
+    /// The banner ad simply overlays the bottom of this picture.</summary>
     private void FitCamera()
     {
         lastScreenW = Screen.width; lastScreenH = Screen.height;
