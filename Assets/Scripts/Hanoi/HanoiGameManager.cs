@@ -74,9 +74,6 @@ public class HanoiGameManager : MonoBehaviour
     private readonly System.Collections.Generic.List<HanoiBlock> blocks = new System.Collections.Generic.List<HanoiBlock>();
     private int lastScreenW, lastScreenH;
 
-    // orientation we must restore when leaving the level
-    private ScreenOrientation prevOrientation;
-    private bool prevPortrait, prevPortraitUD, prevLandL, prevLandR;
 
     // ------------------------------------------------------------ lifecycle
 
@@ -84,7 +81,6 @@ public class HanoiGameManager : MonoBehaviour
     {
         Instance = this;
         Time.timeScale = 1f;
-        ForceLandscape();
 
         if (Camera.main != null && Camera.main.GetComponent<Physics2DRaycaster>() == null)
             Camera.main.gameObject.AddComponent<Physics2DRaycaster>();   // lets blocks receive touch/mouse drags
@@ -105,7 +101,6 @@ public class HanoiGameManager : MonoBehaviour
     private void OnDestroy()
     {
         if (Instance == this) Instance = null;
-        RestoreOrientation();
     }
 
     private void Update()
@@ -120,30 +115,6 @@ public class HanoiGameManager : MonoBehaviour
     }
 
     // ---------------------------------------------------------------- setup
-
-    private void ForceLandscape()
-    {
-        prevOrientation = Screen.orientation;
-        prevPortrait = Screen.autorotateToPortrait;
-        prevPortraitUD = Screen.autorotateToPortraitUpsideDown;
-        prevLandL = Screen.autorotateToLandscapeLeft;
-        prevLandR = Screen.autorotateToLandscapeRight;
-
-        Screen.autorotateToPortrait = false;
-        Screen.autorotateToPortraitUpsideDown = false;
-        Screen.autorotateToLandscapeLeft = true;
-        Screen.autorotateToLandscapeRight = true;
-        Screen.orientation = ScreenOrientation.LandscapeLeft;
-    }
-
-    private void RestoreOrientation()
-    {
-        Screen.autorotateToPortrait = prevPortrait;
-        Screen.autorotateToPortraitUpsideDown = prevPortraitUD;
-        Screen.autorotateToLandscapeLeft = prevLandL;
-        Screen.autorotateToLandscapeRight = prevLandR;
-        Screen.orientation = prevOrientation;
-    }
 
     /// <summary>Shows the whole background; extra height (wide-short screens) is added above, as sky.
     /// The banner ad simply overlays the bottom of this picture.</summary>
