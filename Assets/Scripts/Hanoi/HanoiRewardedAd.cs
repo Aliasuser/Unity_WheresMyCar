@@ -29,6 +29,12 @@ public class HanoiRewardedAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSh
     [Header("UI")]
     public Button watchAdButton;
     public Text watchAdLabel;
+    [Tooltip("Shows how many ads were watched out of the maximum, e.g. 0/3. Created under the button automatically if left empty.")]
+    public Text usesText;
+    [Tooltip("Colour of the counter while ads can still be watched.")]
+    public Color usesAvailableColor = new Color(0.10f, 0.80f, 0.20f);   // bright green
+    [Tooltip("Colour of the counter when no ads are left (3/3).")]
+    public Color usesEmptyColor = new Color(0.90f, 0.15f, 0.15f);
 
     private bool adLoaded;
     private bool adShowing;
@@ -44,6 +50,7 @@ public class HanoiRewardedAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSh
             watchAdButton.onClick.RemoveAllListeners();
             watchAdButton.onClick.AddListener(ShowAd);
             watchAdButton.interactable = false;
+            if (usesText == null) usesText = CreateUsesText();
         }
         RefreshLabel();
     }
@@ -72,6 +79,43 @@ public class HanoiRewardedAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSh
     {
         if (watchAdLabel != null)
             watchAdLabel.text = "Watch Ad  -" + Mathf.RoundToInt(secondsRemoved) + "s";
+
+        // "watched / allowed", e.g. 0/3 at the start of an attempt, 3/3 when no ads are left.
+        if (usesText != null)
+        {
+            int watched = maxUsesPerRun - usesLeft;
+            usesText.text = "Ads: " + watched + "/" + maxUsesPerRun;
+            usesText.color = usesLeft > 0 ? usesAvailableColor : usesEmptyColor;
+        }
+    }
+
+    /// <summary>Small text directly under the Watch Ad button.</summary>
+    private Text CreateUsesText()
+    {
+        var go = new GameObject("UsesText", typeof(RectTransform), typeof(Text));
+        go.transform.SetParent(watchAdButton.transform, false);
+
+        var rt = (RectTransform)go.transform;
+        rt.anchorMin = new Vector2(0.5f, 0f);
+        rt.anchorMax = new Vector2(0.5f, 0f);
+        rt.pivot = new Vector2(0.5f, 1f);
+        rt.anchoredPosition = new Vector2(0f, -6f);
+        rt.sizeDelta = new Vector2(400f, 60f);
+
+        var t = go.GetComponent<Text>();
+        if (watchAdLabel != null) t.font = watchAdLabel.font;
+        if (t.font == null) t.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        t.fontSize = 44;
+        t.fontStyle = FontStyle.Bold;
+        t.alignment = TextAnchor.MiddleCenter;
+        t.horizontalOverflow = HorizontalWrapMode.Overflow;
+        t.raycastTarget = false;
+
+        // dark outline so the green stays readable on the light background
+        var outline = go.AddComponent<Outline>();
+        outline.effectColor = new Color(0f, 0f, 0f, 0.85f);
+        outline.effectDistance = new Vector2(2f, -2f);
+        return t;
     }
 
     // ---------------------------------------------------------------- loading / showing
@@ -133,6 +177,7 @@ public class HanoiRewardedAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSh
         if (placementId == adUnitId && state == UnityAdsShowCompletionState.COMPLETED)
         {
             usesLeft--;
+            RefreshLabel();
             if (HanoiGameManager.Instance != null)
                 HanoiGameManager.Instance.ReduceTime(secondsRemoved);
         }

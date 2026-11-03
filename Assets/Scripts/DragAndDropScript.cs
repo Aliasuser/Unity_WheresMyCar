@@ -58,9 +58,7 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
         GameObjectsScript.isDragging = true;
         canvasGroup.alpha = 0.6f;
         canvasGroup.blocksRaycasts = false;
-        int lastIndex = transform.parent.childCount - 1;
-        int positionIndex = Mathf.Max(0, lastIndex - 1);
-        transform.SetSiblingIndex(positionIndex);
+        MoveBehindFlyingObjects();   // above the other cars, but always BEHIND clouds / planes / bombs
 
         Vector3 cursorWorldPos;
         if (ScreenToWorldPoint(eventData.position, out cursorWorldPos))
@@ -84,6 +82,37 @@ public class DragAndDropScript : MonoBehaviour, IPointerDownHandler, IBeginDragH
             screenBoundaryScript.offset = rectTransform.localPosition - Camera.main.ScreenToWorldPoint(
                 new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenBoundaryScript.screenPoint.z));*/
         GameObjectsScript.lastDragged = eventData.pointerDrag;
+    }
+
+    /// <summary>
+    /// Puts this car just below the lowest flying object (cloud, plane, bomb) in the Canvas hierarchy.
+    /// Canvas draws children in order, so the car ends up above the other cars but behind everything that flies.
+    /// </summary>
+    private void MoveBehindFlyingObjects()
+    {
+        Transform parent = transform.parent;
+
+        int firstFlying = -1;
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            if (parent.GetChild(i).GetComponent<FlyingObjectControllerScript>() != null)
+            {
+                firstFlying = i;
+                break;
+            }
+        }
+
+        if (firstFlying < 0)
+        {
+            // Nothing is flying right now: keep the old behaviour (just below the last child).
+            int lastIndex = parent.childCount - 1;
+            transform.SetSiblingIndex(Mathf.Max(0, lastIndex - 1));
+            return;
+        }
+
+        int target = firstFlying;
+        if (transform.GetSiblingIndex() < firstFlying) target--;   // removing ourselves shifts the others down by one
+        transform.SetSiblingIndex(Mathf.Max(0, target));
     }
 
     private bool ScreenToWorldPoint(Vector2 screenPosition, out Vector3 worldPosition)
